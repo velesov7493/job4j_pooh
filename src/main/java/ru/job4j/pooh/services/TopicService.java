@@ -10,6 +10,8 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class TopicService implements Service {
 
+    private static final int TOTAL_CLIENTS = 50;
+
     private Map<String, Queue<String>> messages;
 
     public TopicService() {
@@ -22,12 +24,14 @@ public class TopicService implements Service {
         return messagesQueue != null ? messagesQueue.poll() : "";
     }
 
-    private void postMessage(String topicName, int clientId, String text) {
-        String tName = String.format("%s[%d]", topicName, clientId);
-        Queue<String> nq = new ConcurrentLinkedDeque<>();
-        Queue<String> mq = messages.putIfAbsent(tName, nq);
-        Queue<String> queue = mq == null ? nq : mq;
-        queue.offer(text);
+    private void postMessage(String topicName, String text) {
+        for (int i = 1; i <= TOTAL_CLIENTS; i++) {
+            String tName = String.format("%s[%d]", topicName, i);
+            Queue<String> nq = new ConcurrentLinkedDeque<>();
+            Queue<String> mq = messages.putIfAbsent(tName, nq);
+            Queue<String> queue = mq == null ? nq : mq;
+            queue.offer(text);
+        }
     }
 
     public Response process(Request request) {
@@ -43,8 +47,8 @@ public class TopicService implements Service {
                 System.out.println("Провал передачи сообщения темы. Статус [" + status + "].");
             }
         } else if ("POST".equals(request.method())) {
-            postMessage(request.resourceName(), request.clientId(), request.text());
-            result = new Response("Сообщение добавлено в тему.", 200);
+            postMessage(request.resourceName(), request.text());
+            result = new Response("Сообщение добавлено в тему.\r\n", 200);
             System.out.println("Сообщение [" + request.text() + "] добавлено в тему.");
         } else {
             result = new Response("", 405);

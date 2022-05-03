@@ -4,6 +4,8 @@
 #    - CODECOV_TOKEN="47b6c95f-283e-4cfe-b7a6-c619bcc8539c"
 
 language: java
+dist: bionic
+
 jdk:
   - openjdk14
 

@@ -21,10 +21,17 @@ public class Response {
     public String statusMessage() {
         String result;
         switch (status) {
-            case 200: result = "OK"; break;
-            case 404: result = "Not found"; break;
-            case 405: result = "Method Not Allowed"; break;
-            default: result = "Unknown";
+            case 200:
+                result = "OK";
+                break;
+            case 404:
+                result = "Not found";
+                break;
+            case 405:
+                result = "Method Not Allowed";
+                break;
+            default:
+                result = "Unknown";
         }
         return result;
     }
